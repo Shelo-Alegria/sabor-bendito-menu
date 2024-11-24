@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor Bendito Empanadas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .mensaje-bienvenida {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+            z-index: 100;
+            animation: fadeOut 1s ease-in-out 3s forwards;
+        }
+        .mensaje-bienvenida p {
+            margin: 5px 0;
+        }
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+        .recuadro {
+            border: 2px solid #000;
+            padding: 20px;
+            width: 90%;
+            margin: 20px auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            position: relative;
+        }
+        .titulo {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        .reset-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .reset-btn:hover {
+            background-color: #e53935;
+        }
+        .menu {
+            margin-bottom: 20px;
+        }
+        .menu table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .menu th, .menu td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .menu th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .botones {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .botones .opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .botones .opciones h4 {
+            font-size: 14px;
+            margin: 0;
+            padding-bottom: 5px;
+            color: #333;
+        }
+        .botones button, .botones input {
+            padding: 8px;
+            font-size: 14px;
+            width: 100%;
+        }
+        .botones input {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Media Queries para móviles */
+        @media (max-width: 600px) {
+            .titulo {
+                font-size: 20px;
+            }
+            .reset-btn {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+            .menu table {
+                font-size: 12px;
+            }
+            .botones {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .botones button, .botones input {
+                font-size: 12px;
+            }
+            .botones .opciones h4 {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mensaje-bienvenida">
+        <p><strong>Sabor Bendito Empanadas</strong></p>
+        <p>Desde 2023</p>
+    </div>
+    <div class="recuadro">
+        <div class="titulo">Sabor Bendito Empanadas</div>
+        <button class="reset-btn" onclick="resetearCantidades()">Resetear todo</button>
+        <!-- Menú de empanadas -->
+        <div class="menu">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Empanada</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody id="menu-table-body">
+                    <!-- Filas generadas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Botones y opciones -->
+        <div class="botones" id="opciones-container">
+            <!-- Opciones generadas dinámicamente -->
+        </div>
+    </div>
+    <script>
+        // Cargamos cantidades desde Local Storage o inicializamos
+        const cantidades = JSON.parse(localStorage.getItem('cantidades')) || {
+            napolitana: 0,
+            pino: 0,
+            'pino-merken': 0,
+            'pollo-morron': 0,
+            'pollo-champinon': 0,
+            vegetariana: 0,
+            'aceituna-champinon': 0,
+            chaparrita: 0,
+            'dobladita-queso': 0,
+            'dobladita-doble-queso': 0,
+            'dobladita-jamon-queso': 0
+        };
+
+        function generarMenu() {
+            const menuTableBody = document.getElementById('menu-table-body');
+            menuTableBody.innerHTML = ''; // Limpiar contenido existente
+            Object.keys(cantidades).forEach(tipo => {
+                const row = document.createElement('tr');
+                const nombreCell = document.createElement('td');
+                const cantidadCell = document.createElement('td');
+                const cantidadSpan = document.createElement('span');
+
+                nombreCell.textContent = tipo.replace(/-/g, ' ').toUpperCase();
+                cantidadSpan.id = `cantidad-${tipo}`;
+                cantidadSpan.textContent = cantidades[tipo] > 0 ? cantidades[tipo] : 'No disponible';
+
+                cantidadCell.appendChild(cantidadSpan);
+                row.appendChild(nombreCell);
+                row.appendChild(cantidadCell);
+                menuTableBody.appendChild(row);
+            });
+        }
+
+        function generarBotones() {
+            const opcionesContainer = document.getElementById('opciones-container');
+            opcionesContainer.innerHTML = ''; // Limpiar contenido existente
+            Object.keys(cantidades).forEach(tipo => {
+                const opcionesDiv = document.createElement('div');
+                opcionesDiv.classList.add('opciones');
+
+                // Nombre de la empanada
+                const tituloEmpanada = document.createElement('h4');
+                tituloEmpanada.textContent = tipo.replace(/-/g, ' ').toUpperCase();
+
+                // Botón Agregar
+                const agregarBtn = document.createElement('button');
+                agregarBtn.textContent = 'Agregar';
+                agregarBtn.onclick = () => agregarEmpanada(tipo);
+
+                // Botón Quitar
+                const quitarBtn = document.createElement('button');
+                quitarBtn.textContent = 'Quitar';
+                quitarBtn.onclick = () => quitarEmpanada(tipo);
+
+                // Modificar Manual
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `manual-${tipo}`;
+                input.placeholder = '0';
+
+                const modificarBtn = document.createElement('button');
+                modificarBtn.textContent = 'Modificar Manual';
+                modificarBtn.onclick = () => modificarManual(tipo);
+
+                opcionesDiv.appendChild(tituloEmpanada);
+                opcionesDiv.appendChild(agregarBtn);
+                opcionesDiv.appendChild(quitarBtn);
+                opcionesDiv.appendChild(input);
+                opcionesDiv.appendChild(modificarBtn);
+
+                opcionesContainer.appendChild(opcionesDiv);
+            });
+        }
+
+        function agregarEmpanada(tipo) {
+            cantidades[tipo]++;
+            actualizarCantidad(tipo);
+            guardarCantidades();
+        }
+
+        function quitarEmpanada(tipo) {
+            if (cantidades[tipo] > 0) cantidades[tipo]--;
+            actualizarCantidad(tipo);
+            guardarCantidades();
+        }
+
+        function modificarManual(tipo) {
+            const input = document.getElementById(`manual-${tipo}`);
+            const valor = parseInt(input.value);
+            if (!isNaN(valor)) {
+                cantidades[tipo] += valor;
+                if (cantidades[tipo] < 0) cantidades[tipo] = 0;
+                actualizarCantidad(tipo);
+                guardarCantidades();
+                input.value = '';
+            }
+        }
+
+        function actualizarCantidad(tipo) {
+            const cantidadSpan = document.getElementById(`cantidad-${tipo}`);
+            cantidadSpan.textContent = cantidades[tipo] > 0 ? cantidades[tipo] : 'No disponible';
+        }
+
+        function guardarCantidades() {
+            localStorage.setItem('cantidades', JSON.stringify(cantidades));
+        }
+
+        function resetearCantidades() {
+            Object.keys(cantidades).forEach(tipo => cantidades[tipo] = 0);
+            guardarCantidades();
+            generarMenu();
+            generarBotones();
+        }
+
+        // Inicialización
+        setTimeout(() => {
+            const bienvenida = document.querySelector('.mensaje-bienvenida');
+            bienvenida.style.display = 'none';
+        }, 3000);
+
+        generarMenu();
+        generarBotones();
+    </script>
+</body>
+</html>
